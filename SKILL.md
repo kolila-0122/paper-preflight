@@ -1,4 +1,21 @@
-# manuscript-semantic-audit
+---
+name: manuscript-semantic-audit
+display_name: "稿件语义审计"
+display_name_en: "Manuscript Semantic Audit"
+description: >-
+  Pre-submission audit for a manuscript, in three ordered layers. L1 runs deterministic
+  consistency checks: figures cited out of order, a figure with no legend or a legend never
+  cited, the same metric reported with two different values, abbreviations used before they
+  are defined, near-duplicate sentences, repeated sentence openers, tension between the
+  limitations paragraph and the body. L2 measures prose against a 5,715-sentence corpus
+  baseline (sentence-length distribution, connective density and variety, hedging). L3 is a
+  written protocol for semantic review: claim-evidence alignment, cross-section
+  contradictions, terminology drift. Use for 投稿前自查、稿件审计、图表编号、图注缺失、
+  缩写未定义、数值不一致、跨节矛盾、术语不统一、语义一致性检查, pre-submission check,
+  manuscript audit, figure numbering, citation order, consistency check.
+---
+
+# 稿件语义审计（Manuscript Semantic Audit）
 
 稿件提交前审计：**先查能不能被判"不合格"（可判定的硬伤），再查读起来像不像人写的（文体基线），最后才查说得对不对（语义复核）**。
 
