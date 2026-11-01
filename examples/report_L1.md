@@ -1,37 +1,37 @@
-# 语义一致性审计（确定性规则层）
+# Semantic consistency audit (deterministic layer)
 
-- 文件：`examples/demo_manuscript.md`
-- 词数：762｜句数：64
-- 命中：**6** 条｜高 2｜中 4｜低 0
+- File: `examples/demo_manuscript.md`
+- 762 words | 64 sentences
+- Findings: **6** | high 2 | medium 4 | low 0
 
-> 本层只报**可判定**的不一致。真正的语义对错（机制说不通、证据不支持结论）见 `references/protocol.md` 的 LLM 复核流程。
+> This layer reports only **decidable** inconsistencies. For whether a claim is scientifically wrong, see the review protocol in `references/protocol.md`.
 
-## 高风险（2 条）
+## High risk (2)
 
-### 同名指标数值冲突 — `number_conflict`
-- name: ion of random sets that matched the score
+### Same metric reported with different values — `number_conflict`
+- name: random sets that matched the score
 - unit: %
 - values: ['4.2', '6.1']
 - count: 2
 
-### 有图注但正文未引用 — `fig_legend_not_cited`
+### Legend present but figure never cited — `fig_legend_not_cited`
 - fig: 2
 
-## 中风险（4 条）
+## Medium risk (4)
 
-### 图号引用顺序错乱 — `fig_out_of_order`
+### Figures not cited in order — `fig_out_of_order`
 - order: [3, 1]
 
-### 缩写首次出现未定义 — `abbr_undefined`
+### Abbreviation used before definition — `abbr_undefined`
 - abbr: PFS
 - pos: 3387
 - ctx: random sets that matched the score was 6.1%.  The PFS analysis gave a 
 
-### 近重复句 — `near_duplicate`
+### Near-duplicate sentences — `near_duplicate`
 - ratio: 0.85
 - a: The score was associated with overall survival in both.
 - b: The score was associated with survival in both cohorts.
 
-### 同一句式反复起句 — `repeated_opener`
+### Same sentence opener repeated — `repeated_opener`
 - head: the score was
 - count: 4

@@ -42,6 +42,8 @@ For `.docx`, pass the file directly; legends and tables are read too.
 
 ## What it looks like
 
+![Example L1 report](docs/example-output.png)
+
 `examples/demo_manuscript.md` is a short paper with defects planted on purpose.
 Running L1 on it gives:
 

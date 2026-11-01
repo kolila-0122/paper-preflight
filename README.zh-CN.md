@@ -28,7 +28,15 @@ python scripts/style_audit.py --file 稿件.md --out 报告_L2.md
 
 `.docx` 可直接传入，图注与表格一并读取。
 
+报告默认英文；需要中文加 `--lang zh`：
+
+```bash
+python scripts/semantic_audit.py --file 稿件.md --out 报告.md --lang zh
+```
+
 ## 示例
+
+![L1 报告示例](docs/example-output.png)
 
 `examples/demo_manuscript.md` 是一篇**故意埋了 6 个缺陷**的短文。跑 L1：
 

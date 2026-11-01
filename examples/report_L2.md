@@ -1,34 +1,34 @@
-# 文体体检（对照语料基线）
+# Style audit against corpus baseline
 
-- 文件：`examples/demo_manuscript.md`
-- 基线：`baseline.json`（16 篇 PMC 全文（用本脚本同一分句器重算））
+- File: `examples/demo_manuscript.md`
+- Baseline: `baseline.json` (16 篇 PMC 全文（用本脚本同一分句器重算）)
 
-| 指标 | 本稿 | 基线 | 建议 | 判定 |
+| Metric | This manuscript | Baseline | Target | Verdict |
 |---|---:|---:|---|---|
-| 句子数 | 63 | 5715 |  |  |
-| 平均句长 | 11.5 | 21.9 | ≤23 且 ≥20 | ⚠ |
-| ≥35 词句占比 % | 1.6 | 9.9 | ≤12 | ok |
-| ≤15 词句占比 % | 77.8 | 31.5 | 28–33 | ⚠ |
-| 连接词密度 /百句 | 14.3 | 21.2 | ≤22 | ok |
-| 连接词种类 | 5 | 38 | ≥25 提示换叙事 | ⚠ |
-| hedge /百句 | 12.7 | 12.2 | 尽量接近基线 |  |
-| booster /百句 | 0.0 | 0.1 |  |  |
-| hedge/booster | inf | 116.33 | >1 | ok |
+| Sentences | 64 | 5715 |  |  |
+| Mean sentence length | 11.6 | 21.9 | 20-23 | ⚠ |
+| Sentences >= 35 words, % | 1.6 | 9.9 | <=12 | ok |
+| Sentences <= 15 words, % | 78.1 | 31.5 | 28-33 | ⚠ |
+| Connectives per 100 sentences | 14.1 | 21.2 | <=22 | ok |
+| Connective types | 5 | 38 | >=25; low values usually mean a missing rhetorical slot | ⚠ |
+| Hedges per 100 sentences | 12.5 | 12.2 | as close to baseline as possible |  |
+| Boosters per 100 sentences | 0.0 | 0.1 |  |  |
+| Hedge/booster ratio | inf | 116.33 | >1 | ok |
 
-## 连接词逐项（本稿 / 基线 每百句）
+## Connectives, per 100 sentences
 
-| 词 | 本稿 | 基线 |
+| Connective | This manuscript | Baseline |
 |---|---:|---:|
 | while | 0.00 | 1.40 |
-| overall | 3.17 | 0.80 |
+| overall | 3.12 | 0.80 |
 | furthermore | 0.00 | 0.70 |
 | however | 0.00 | 0.70 |
 | whereas | 0.00 | 0.63 |
 | additionally | 0.00 | 0.59 |
-| therefore | 4.76 | 0.53 |
-| but | 3.17 | 0.52 |
-| first | 1.59 | 0.52 |
+| therefore | 4.69 | 0.53 |
+| but | 3.12 | 0.52 |
 | notably | 0.00 | 0.53 |
+| first | 1.56 | 0.52 |
 | although | 0.00 | 0.49 |
 | moreover | 0.00 | 0.46 |
 | rather | 0.00 | 0.45 |

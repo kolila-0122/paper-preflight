@@ -77,48 +77,48 @@ def main():
     ratio = round(hed / boo, 2) if boo else float("inf")
 
     rows = [
-        ("句子数", n, base["n_sent"], ""),
-        ("平均句长", round(mean, 1), base["sent_mean"], "≤23 且 ≥20"),
-        ("≥35 词句占比 %", round(long_pct, 1), base["long_pct"], "≤12"),
-        ("≤15 词句占比 %", round(short_pct, 1), base["short_pct"], "28–33"),
-        ("连接词密度 /百句", round(dens, 1), base["conn_density"], "≤22"),
-        ("连接词种类", len(cc), base["conn_types"], "≥25 提示换叙事"),
-        ("hedge /百句", round(hed / n * 100, 1), base["hedge_density"], "尽量接近基线"),
-        ("booster /百句", round(boo / n * 100, 1), base["booster_density"], ""),
-        ("hedge/booster", ratio, base["hedge_booster"], ">1"),
+        ("Sentences", n, base["n_sent"], ""),
+        ("Mean sentence length", round(mean, 1), base["sent_mean"], "20-23"),
+        ("Sentences >= 35 words, %", round(long_pct, 1), base["long_pct"], "<=12"),
+        ("Sentences <= 15 words, %", round(short_pct, 1), base["short_pct"], "28-33"),
+        ("Connectives per 100 sentences", round(dens, 1), base["conn_density"], "<=22"),
+        ("Connective types", len(cc), base["conn_types"], ">=25; low values usually mean a missing rhetorical slot"),
+        ("Hedges per 100 sentences", round(hed / n * 100, 1), base["hedge_density"], "as close to baseline as possible"),
+        ("Boosters per 100 sentences", round(boo / n * 100, 1), base["booster_density"], ""),
+        ("Hedge/booster ratio", ratio, base["hedge_booster"], ">1"),
     ]
 
     def verdict(name, val, ref, rule):
         if not rule:
             return ""
-        if name == "平均句长":
+        if name.startswith("Mean sentence"):
             return "⚠" if not (20 <= val <= 23) else "ok"
-        if name == "≥35 词句占比 %":
+        if name.startswith("Sentences >= 35"):
             return "⚠" if val > 12 else "ok"
-        if name == "≤15 词句占比 %":
+        if name.startswith("Sentences <= 15"):
             return "⚠" if not (28 <= val <= 33) else "ok"
-        if name == "连接词密度 /百句":
+        if name.startswith("Connectives per 100"):
             return "⚠" if val > 22 else "ok"
-        if name == "连接词种类":
+        if name.startswith("Connective types"):
             return "⚠" if val < 25 else "ok"
-        if name == "hedge/booster":
+        if name.startswith("Hedge/booster"):
             return "⚠" if val < 1 else "ok"
         return ""
 
-    L2 = ["# 文体体检（对照语料基线）", "",
-          f"- 文件：`{a.file}`",
-          f"- 基线：`{os.path.basename(a.baseline)}`（{base['source']}）", "",
-          "| 指标 | 本稿 | 基线 | 建议 | 判定 |", "|---|---:|---:|---|---|"]
+    L2 = ["# Style audit against corpus baseline", "",
+          f"- File: `{a.file}`",
+          f"- Baseline: `{os.path.basename(a.baseline)}` ({base['source']})", "",
+          "| Metric | This manuscript | Baseline | Target | Verdict |", "|---|---:|---:|---|---|"]
     for name, val, ref, rule in rows:
         L2.append(f"| {name} | {val} | {ref} | {rule} | {verdict(name, val, ref, rule)} |")
-    L2 += ["", "## 连接词逐项（本稿 / 基线 每百句）", "", "| 词 | 本稿 | 基线 |", "|---|---:|---:|"]
+    L2 += ["", "## Connectives, per 100 sentences", "", "| Connective | This manuscript | Baseline |", "|---|---:|---:|"]
     bc = base.get("conn_detail", {})
     for k in sorted(set(cc) | set(bc), key=lambda x: -(cc.get(x, 0) + bc.get(x, 0)))[:14]:
         L2.append(f"| {k} | {cc.get(k,0)/n*100:.2f} | {bc.get(k,0)/100:.2f} |")
 
     open(a.out, "w", encoding="utf-8").write("\n".join(L2))
     warn = sum(1 for name, val, ref, rule in rows if verdict(name, val, ref, rule) == "⚠")
-    print(f"⚠ {warn} 项超阈值 → {a.out}")
+    print(f"{warn} metric(s) outside target -> {a.out}")
     sys.exit(0)
 
 

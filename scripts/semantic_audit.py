@@ -83,6 +83,10 @@ def check_number_conflict(text):
         name = re.sub(r"\s+", " ", m.group("name")).strip().lower()
         name = re.sub(r"^(the|a|an|and|but|which|that|this|these|its|their|with|of)\s+", "", name)
         name = name.strip()
+        # 起点可能落在词中间（正则从 40 字窗口截断），丢掉半个词
+        if m.start("name") > 0 and text[m.start("name") - 1].isalpha():
+            name = " ".join(name.split()[1:])
+        name = re.sub(r"^(of|the|a|an|and|but|which|that|this|these|its|their|with)\s+", "", name).strip()
         # 整词匹配：单字母 "n" 若用子串匹配会误伤 random / linear 等词
         if len(name.split()) < 2 or any(re.search(rf"\b{re.escape(b)}\b", name) for b in BAN):
             continue
@@ -255,11 +259,60 @@ SEVERITY = {
 }
 
 
+
+LANG = {
+    "en": {
+        "title": "# Semantic consistency audit (deterministic layer)",
+        "file": "File", "words": "words", "sent": "sentences",
+        "hits": "Findings", "high": "high", "medium": "medium", "low": "low",
+        "note": "> This layer reports only **decidable** inconsistencies. For whether a claim is "
+                "scientifically wrong, see the review protocol in `references/protocol.md`.",
+        "sev": {"高": "High risk", "中": "Medium risk", "低": "Low risk"},
+        "titles": {
+            "number_conflict": "Same metric reported with different values",
+            "fig_cited_no_legend": "Figure cited but no legend",
+            "fig_legend_not_cited": "Legend present but figure never cited",
+            "fig_out_of_order": "Figures not cited in order",
+            "abbr_undefined": "Abbreviation used before definition",
+            "near_duplicate": "Near-duplicate sentences",
+            "repeated_opener": "Same sentence opener repeated",
+            "cross_section_tension": "Tension between sections",
+            "dangling_reference": "Reference without antecedent",
+            "positional_reference": "Positional reference (as shown above)",
+            "strong_claim": "Strong claim word",
+            "terminology_variants": "Terminology not unified",
+        },
+    },
+    "zh": {
+        "title": "# 语义一致性审计（确定性规则层）",
+        "file": "文件", "words": "词数", "sent": "句数",
+        "hits": "命中", "high": "高", "medium": "中", "low": "低",
+        "note": "> 本层只报**可判定**的不一致。真正的语义对错（机制说不通、证据不支持结论）"
+                "见 `references/protocol.md` 的复核流程。",
+        "sev": {"高": "高风险", "中": "中风险", "低": "低风险"},
+        "titles": {
+            "number_conflict": "同名指标数值冲突",
+            "fig_cited_no_legend": "图被引用但无图注",
+            "fig_legend_not_cited": "有图注但正文未引用",
+            "fig_out_of_order": "图号引用顺序错乱",
+            "abbr_undefined": "缩写首次出现未定义",
+            "near_duplicate": "近重复句",
+            "repeated_opener": "同一句式反复起句",
+            "cross_section_tension": "跨节陈述张力",
+            "dangling_reference": "指代无先行词",
+            "positional_reference": "指向性表述",
+            "strong_claim": "强断言词",
+            "terminology_variants": "术语变体不统一",
+        },
+    },
+}
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--file", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--json")
+    ap.add_argument("--lang", default="en", choices=["en", "zh"])
     a = ap.parse_args()
 
     raw = read_text(a.file)
@@ -280,39 +333,29 @@ def main():
     for i in issues:
         by_sev[SEVERITY.get(i["kind"], "低")].append(i)
 
-    L = ["# 语义一致性审计（确定性规则层）", "",
-         f"- 文件：`{a.file}`",
-         f"- 词数：{len(text.split())}｜句数：{len(split_sentences(text))}",
-         f"- 命中：**{len(issues)}** 条｜高 {len(by_sev['高'])}｜中 {len(by_sev['中'])}｜低 {len(by_sev['低'])}", "",
-         "> 本层只报**可判定**的不一致。真正的语义对错（机制说不通、证据不支持结论）"
-         "见 `references/protocol.md` 的 LLM 复核流程。", ""]
+    t = LANG[a.lang]
+    L = [t["title"], "",
+         "- " + t["file"] + ": `" + a.file + "`",
+         "- " + str(len(text.split())) + " " + t["words"] + " | " +
+         str(len(split_sentences(text))) + " " + t["sent"],
+         "- " + t["hits"] + ": **" + str(len(issues)) + "** | " +
+         t["high"] + " " + str(len(by_sev["高"])) + " | " +
+         t["medium"] + " " + str(len(by_sev["中"])) + " | " +
+         t["low"] + " " + str(len(by_sev["低"])), "",
+         t["note"], ""]
 
-    titles = {
-        "number_conflict": "同名指标数值冲突",
-        "fig_cited_no_legend": "图被引用但无图注",
-        "fig_legend_not_cited": "有图注但正文未引用",
-        "fig_out_of_order": "图号引用顺序错乱",
-        "abbr_undefined": "缩写首次出现未定义",
-        "near_duplicate": "近重复句",
-        "repeated_opener": "同一句式反复起句",
-        "cross_section_tension": "跨节陈述张力",
-        "dangling_reference": "指代无先行词",
-        "positional_reference": "指向性表述（as shown above）",
-        "strong_claim": "强断言词",
-        "terminology_variants": "术语变体不统一",
-    }
     for sev in ["高", "中", "低"]:
         if not by_sev[sev]:
             continue
-        L.append(f"## {sev}风险（{len(by_sev[sev])} 条）")
+        L.append("## " + t["sev"][sev] + " (" + str(len(by_sev[sev])) + ")")
         L.append("")
         for i in by_sev[sev]:
-            t = titles.get(i["kind"], i["kind"])
-            L.append(f"### {t} — `{i['kind']}`")
+            title = t["titles"].get(i["kind"], i["kind"])
+            L.append("### " + title + " \u2014 `" + i["kind"] + "`")
             for k, v in i.items():
                 if k == "kind":
                     continue
-                L.append(f"- {k}: {v}")
+                L.append("- " + k + ": " + str(v))
             L.append("")
     open(a.out, "w", encoding="utf-8").write("\n".join(L))
 
