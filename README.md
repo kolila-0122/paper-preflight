@@ -1,4 +1,6 @@
-# manuscript-semantic-audit
+# paper-preflight
+
+English | [简体中文](README.zh-CN.md)
 
 Pre-submission audit for scientific manuscripts. Catches the errors that get papers
 returned at technical check — figures cited out of order, abbreviations used before
