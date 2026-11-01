@@ -1,0 +1,20 @@
+name: audit
+
+on: [push, pull_request]
+
+jobs:
+  selftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: L1 must find the planted defects
+        run: |
+          python scripts/semantic_audit.py --file examples/demo_manuscript.md --out /tmp/L1.md || true
+          grep -q "fig_out_of_order" /tmp/L1.md
+          grep -q "abbr_undefined" /tmp/L1.md
+          grep -q "number_conflict" /tmp/L1.md
+      - name: L2 must run
+        run: python scripts/style_audit.py --file examples/demo_manuscript.md --out /tmp/L2.md
